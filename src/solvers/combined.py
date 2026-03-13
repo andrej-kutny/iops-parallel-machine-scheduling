@@ -4,10 +4,10 @@ import copy
 import time
 from typing import Callable
 
-from src.models.instance import SchedulingInstance
-from src.models.solution import SchedulingSolution
-from src.stopping_criteria import StoppingCriterion
-from src.solvers.base import SolverBase, VerboseCallback
+from models.instance import SchedulingInstance
+from models.solution import SchedulingSolution
+from stopping_criteria import StoppingCriterion
+from solvers.base import SolverBase, VerboseCallback
 
 
 class CombinedSolver(SolverBase):

@@ -1,6 +1,6 @@
 import time
 
-from src.stopping_criteria import (
+from stopping_criteria import (
     MaxGenerations, TimeLimit, GenMinImprovement, TimeMinImprovement, TargetObjective,
 )
 

@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.models.solution import SchedulingSolution
-from src.local_search.operators import (
+from models.solution import SchedulingSolution
+from local_search.operators import (
     swap_within_machine,
     move_within_machine,
     move_to_other_machine,

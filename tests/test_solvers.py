@@ -1,13 +1,13 @@
 import pytest
 
-from src.stopping_criteria import MaxGenerations, TimeLimit
-from src.solvers.grasp import GraspSolver
-from src.solvers.simulated_annealing import SimulatedAnnealingSolver
-from src.solvers.evolution_strategy import EvolutionStrategySolver
-from src.solvers.ant_system import AntSystem, RankedAntSystem, EasAntSystem
-from src.solvers.max_min_ant_system import MaxMinAntSystem
-from src.solvers.ant_colony_system import AntColonySystem
-from src.solvers.ant_multi_tour_system import AntMultiTourSystem
+from stopping_criteria import MaxGenerations, TimeLimit
+from solvers.grasp import GraspSolver
+from solvers.simulated_annealing import SimulatedAnnealingSolver
+from solvers.evolution_strategy import EvolutionStrategySolver
+from solvers.ant_system import AntSystem, RankedAntSystem, EasAntSystem
+from solvers.max_min_ant_system import MaxMinAntSystem
+from solvers.ant_colony_system import AntColonySystem
+from solvers.ant_multi_tour_system import AntMultiTourSystem
 
 
 SHORT_CRITERIA = [MaxGenerations(3)]

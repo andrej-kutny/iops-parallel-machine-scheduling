@@ -2,7 +2,7 @@ import json
 import subprocess
 import os
 
-from src.models.solution import SchedulingSolution
+from models.solution import SchedulingSolution
 
 
 def test_makespan_matches_checker(small_instance, valid_schedule, tmp_path):

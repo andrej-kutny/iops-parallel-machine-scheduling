@@ -4,9 +4,9 @@ import time
 
 import numpy as np
 
-from src.stopping_criteria import StoppingCriterion
-from src.solvers.aco_base import ACOSolverBase
-from src.solvers.base import VerboseCallback
+from stopping_criteria import StoppingCriterion
+from solvers.aco_base import ACOSolverBase
+from solvers.base import VerboseCallback
 
 
 class AntSystem(ACOSolverBase):

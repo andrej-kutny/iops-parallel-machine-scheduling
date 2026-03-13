@@ -7,9 +7,9 @@ from typing import Callable
 
 import numpy as np
 
-from src.models.instance import SchedulingInstance
-from src.models.solution import SchedulingSolution
-from src.stopping_criteria import StoppingCriterion, TimeLimit, GenMinImprovement
+from models.instance import SchedulingInstance
+from models.solution import SchedulingSolution
+from stopping_criteria import StoppingCriterion, TimeLimit, GenMinImprovement
 
 
 DEFAULT_CRITERIA = [TimeLimit(120), GenMinImprovement(window=50, min_pct=0.05)]

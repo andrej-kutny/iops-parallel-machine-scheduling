@@ -5,11 +5,11 @@ from typing import Callable
 
 import numpy as np
 
-from src.models.instance import SchedulingInstance
-from src.models.solution import SchedulingSolution
-from src.stopping_criteria import StoppingCriterion
-from src.local_search.operators import random_neighbor
-from src.solvers.base import SolverBase, VerboseCallback
+from models.instance import SchedulingInstance
+from models.solution import SchedulingSolution
+from stopping_criteria import StoppingCriterion
+from local_search.operators import random_neighbor
+from solvers.base import SolverBase, VerboseCallback
 
 
 class SimulatedAnnealingSolver(SolverBase):

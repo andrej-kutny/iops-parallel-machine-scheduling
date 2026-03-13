@@ -4,12 +4,12 @@ import time
 
 import numpy as np
 
-from src.models.instance import SchedulingInstance
-from src.models.solution import SchedulingSolution
-from src.stopping_criteria import StoppingCriterion
-from src.local_search.operators import local_search
-from src.solvers.aco_base import ACOSolverBase
-from src.solvers.base import VerboseCallback
+from models.instance import SchedulingInstance
+from models.solution import SchedulingSolution
+from stopping_criteria import StoppingCriterion
+from local_search.operators import local_search
+from solvers.aco_base import ACOSolverBase
+from solvers.base import VerboseCallback
 
 
 class AntColonySystem(ACOSolverBase):

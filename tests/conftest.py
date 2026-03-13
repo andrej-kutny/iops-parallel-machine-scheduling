@@ -1,8 +1,8 @@
 import os
 import pytest
 
-from src.models.instance import SchedulingInstance
-from src.models.solution import SchedulingSolution
+from models.instance import SchedulingInstance
+from models.solution import SchedulingSolution
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "src", "data")

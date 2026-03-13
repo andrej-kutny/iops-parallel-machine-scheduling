@@ -4,8 +4,8 @@ import numpy as np
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.models.instance import SchedulingInstance
-    from src.models.solution import SchedulingSolution
+    from models.instance import SchedulingInstance
+    from models.solution import SchedulingSolution
 
 
 def _machine_completion_time(jobs: list[int], machine_id: int, instance: SchedulingInstance) -> int:
@@ -43,7 +43,7 @@ def swap_within_machine(solution: SchedulingSolution, instance: SchedulingInstan
                 if new_time < original_time:
                     new_schedule = {k: list(v) for k, v in solution.schedule.items()}
                     new_schedule[machine_id] = new_jobs
-                    from src.models.solution import SchedulingSolution as SS
+                    from models.solution import SchedulingSolution as SS
                     candidate = SS(new_schedule, instance)
                     candidate_makespan = candidate.compute_makespan()
                     if candidate_makespan < best_makespan:
@@ -73,7 +73,7 @@ def move_within_machine(solution: SchedulingSolution, instance: SchedulingInstan
                 if new_time < original_time:
                     new_schedule = {k: list(v) for k, v in solution.schedule.items()}
                     new_schedule[machine_id] = new_jobs
-                    from src.models.solution import SchedulingSolution as SS
+                    from models.solution import SchedulingSolution as SS
                     candidate = SS(new_schedule, instance)
                     candidate_makespan = candidate.compute_makespan()
                     if candidate_makespan < best_makespan:
@@ -101,7 +101,7 @@ def move_to_other_machine(solution: SchedulingSolution, instance: SchedulingInst
                     new_schedule = {k: list(v) for k, v in solution.schedule.items()}
                     new_schedule[src_machine] = src_without
                     new_schedule[dst_machine] = new_dst
-                    from src.models.solution import SchedulingSolution as SS
+                    from models.solution import SchedulingSolution as SS
                     candidate = SS(new_schedule, instance)
                     candidate_makespan = candidate.compute_makespan()
                     if candidate_makespan < best_makespan:
@@ -140,7 +140,7 @@ def swap_between_machines(solution: SchedulingSolution, instance: SchedulingInst
                     new_schedule = {k: list(v) for k, v in solution.schedule.items()}
                     new_schedule[ma] = new_a
                     new_schedule[mb] = new_b
-                    from src.models.solution import SchedulingSolution as SS
+                    from models.solution import SchedulingSolution as SS
                     candidate = SS(new_schedule, instance)
                     candidate_makespan = candidate.compute_makespan()
                     if candidate_makespan < best_makespan:
@@ -168,7 +168,7 @@ def random_neighbor(solution: SchedulingSolution, instance: SchedulingInstance, 
     if rng is None:
         rng = np.random.default_rng()
 
-    from src.models.solution import SchedulingSolution as SS
+    from models.solution import SchedulingSolution as SS
 
     move_type = rng.integers(0, 4)
     new_schedule = {k: list(v) for k, v in solution.schedule.items()}

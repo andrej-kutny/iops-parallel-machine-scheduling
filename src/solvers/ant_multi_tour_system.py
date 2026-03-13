@@ -4,11 +4,11 @@ import time
 
 import numpy as np
 
-from src.models.instance import SchedulingInstance
-from src.models.solution import SchedulingSolution
-from src.stopping_criteria import StoppingCriterion
-from src.solvers.aco_base import ACOSolverBase
-from src.solvers.base import VerboseCallback
+from models.instance import SchedulingInstance
+from models.solution import SchedulingSolution
+from stopping_criteria import StoppingCriterion
+from solvers.aco_base import ACOSolverBase
+from solvers.base import VerboseCallback
 
 
 class AntMultiTourSystem(ACOSolverBase):

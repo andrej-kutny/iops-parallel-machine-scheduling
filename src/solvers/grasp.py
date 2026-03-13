@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import numpy as np
 
-from src.models.instance import SchedulingInstance
-from src.models.solution import SchedulingSolution
-from src.stopping_criteria import StoppingCriterion
-from src.local_search.operators import local_search
-from src.solvers.base import SolverBase
+from models.instance import SchedulingInstance
+from models.solution import SchedulingSolution
+from stopping_criteria import StoppingCriterion
+from local_search.operators import local_search
+from solvers.base import SolverBase
 
 
 class GraspSolver(SolverBase):

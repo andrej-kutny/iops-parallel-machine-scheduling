@@ -1,29 +1,22 @@
 import json
-import os
 import sys
-
-# Ensure project root is on sys.path so `src.*` imports work
-# regardless of how main.py is invoked
-_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if _project_root not in sys.path:
-    sys.path.insert(0, _project_root)
 
 import numpy as np
 
-from src.cli import parse_args
-from src.models.instance import SchedulingInstance
-from src.stopping_criteria import (
+from cli import parse_args
+from models.instance import SchedulingInstance
+from stopping_criteria import (
     StoppingCriterion, TimeLimit, GenMinImprovement, TimeMinImprovement,
     MaxGenerations, TargetObjective,
 )
-from src.solvers.grasp import GraspSolver
-from src.solvers.simulated_annealing import SimulatedAnnealingSolver
-from src.solvers.evolution_strategy import EvolutionStrategySolver
-from src.solvers.ant_system import AntSystem
-from src.solvers.max_min_ant_system import MaxMinAntSystem
-from src.solvers.ant_colony_system import AntColonySystem
-from src.solvers.ant_multi_tour_system import AntMultiTourSystem
-from src.solvers.combined import CombinedSolver
+from solvers.grasp import GraspSolver
+from solvers.simulated_annealing import SimulatedAnnealingSolver
+from solvers.evolution_strategy import EvolutionStrategySolver
+from solvers.ant_system import AntSystem
+from solvers.max_min_ant_system import MaxMinAntSystem
+from solvers.ant_colony_system import AntColonySystem
+from solvers.ant_multi_tour_system import AntMultiTourSystem
+from solvers.combined import CombinedSolver
 
 
 def build_criteria(args) -> list[StoppingCriterion]:

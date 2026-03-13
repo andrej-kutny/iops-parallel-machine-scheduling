@@ -1,11 +1,11 @@
 import pytest
 
-from src.stopping_criteria import MaxGenerations, TimeLimit, GenMinImprovement
-from src.solvers.grasp import GraspSolver
-from src.solvers.simulated_annealing import SimulatedAnnealingSolver
-from src.solvers.combined import CombinedSolver
-from src.models.solution import SchedulingSolution
-from src.solvers.base import SolverBase
+from stopping_criteria import MaxGenerations, TimeLimit, GenMinImprovement
+from solvers.grasp import GraspSolver
+from solvers.simulated_annealing import SimulatedAnnealingSolver
+from solvers.combined import CombinedSolver
+from models.solution import SchedulingSolution
+from solvers.base import SolverBase
 
 
 class TestCombinedSolver:
