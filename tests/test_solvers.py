@@ -8,6 +8,8 @@ from solvers.ant_system import AntSystem, RankedAntSystem, EasAntSystem
 from solvers.max_min_ant_system import MaxMinAntSystem
 from solvers.ant_colony_system import AntColonySystem
 from solvers.ant_multi_tour_system import AntMultiTourSystem
+from solvers.iterated_local_search import ILSSolver
+from solvers.genetic_algorithm import GeneticAlgorithmSolver
 
 
 SHORT_CRITERIA = [MaxGenerations(3)]
@@ -94,3 +96,45 @@ class TestAntMultiTourSystem:
         solution, cost, history = solver.solve(small_instance)
         feasible, msg = solution.is_feasible()
         assert feasible, msg
+
+
+class TestILSSolver:
+    def test_produces_feasible(self, small_instance):
+        solver = ILSSolver(perturbation_strength=3, criteria=SHORT_CRITERIA)
+        solution, cost, history = solver.solve(small_instance)
+        feasible, msg = solution.is_feasible()
+        assert feasible, msg
+        assert cost > 0
+        assert len(history) > 0
+
+    def test_history_non_increasing_best(self, small_instance):
+        solver = ILSSolver(perturbation_strength=2, criteria=[MaxGenerations(5)])
+        _, cost, history = solver.solve(small_instance)
+        # Best-so-far is non-increasing
+        for i in range(1, len(history)):
+            assert history[i] <= history[i - 1] + 1e-9  # allow float noise
+
+
+class TestGeneticAlgorithmSolver:
+    def test_produces_feasible(self, small_instance):
+        solver = GeneticAlgorithmSolver(
+            population_size=10, offspring_per_generation=10, mutation_strength=1, criteria=SHORT_CRITERIA
+        )
+        solution, cost, history = solver.solve(small_instance)
+        feasible, msg = solution.is_feasible()
+        assert feasible, msg
+        assert cost > 0
+        assert len(history) > 0
+
+    def test_crossover_produces_valid_schedule(self, small_instance):
+        """Crossover + ordering should yield a solution with all jobs assigned once."""
+        from solvers.base import SolverBase
+        from solvers.genetic_algorithm import _crossover
+        import numpy as np
+        rng = np.random.default_rng(42)
+        p1 = SolverBase._random_solution(small_instance, rng)
+        p2 = SolverBase._random_solution(small_instance, rng)
+        child = _crossover(p1, p2, small_instance, rng)
+        feasible, msg = child.is_feasible()
+        assert feasible, msg
+        assert child.compute_makespan() > 0
