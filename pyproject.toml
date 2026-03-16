@@ -15,6 +15,9 @@ dev = [
     "pytest>=9.0.2",
     "pytest-cov",
 ]
+minizinc = [
+    "minizinc>=0.10.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
