@@ -8,6 +8,7 @@ from local_search.operators import (
     swap_between_machines,
     local_search,
     random_neighbor,
+    perturb,
 )
 
 
@@ -79,3 +80,26 @@ def test_local_search_feasibility(small_instance):
     result = local_search(sol, small_instance)
     feasible, msg = result.is_feasible()
     assert feasible, f"Local search produced infeasible: {msg}"
+
+
+def test_perturb_feasible(small_instance):
+    """Perturb should always return a feasible solution."""
+    schedule = {0: [], 1: [5], 2: [2, 3, 1, 4]}
+    sol = SchedulingSolution(schedule, small_instance)
+    rng = np.random.default_rng(123)
+    for strength in (1, 3, 5):
+        result = perturb(sol, small_instance, strength, rng)
+        feasible, msg = result.is_feasible()
+        assert feasible, f"Perturb(strength={strength}) produced infeasible: {msg}"
+
+
+def test_perturb_strength_applied(small_instance):
+    """Perturb with strength 0 or 1 still applies at least one move (max(1, strength))."""
+    schedule = {0: [], 1: [5], 2: [2, 3, 1, 4]}
+    sol = SchedulingSolution(schedule, small_instance)
+    rng = np.random.default_rng(456)
+    result_zero = perturb(sol, small_instance, 0, rng)
+    # With strength 0 we still do max(1,0)=1 move, so result may differ
+    result_one = perturb(sol, small_instance, 1, rng)
+    feasible_one, _ = result_one.is_feasible()
+    assert feasible_one

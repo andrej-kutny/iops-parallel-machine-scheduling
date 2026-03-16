@@ -103,6 +103,31 @@ Your task: **find the smallest makespan you can** using any methods you choose.
 Possible approaches:
 
 - **Exact:** CP (e.g., MiniZinc), MIP, SAT, ASP, etc.
-- **Heuristics:** tabu search, simulated annealing, evolutionary algorithms, LNS, etc.
+- **Heuristics:** tabu search, simulated annealing, evolutionary algorithms, LNS, ILS, GA, etc.
 
 **Instance file:** [357_15_146_H.json](./src/data/357_15_146_H.json)
+
+---
+
+## Solvers
+
+Run from the `src/` directory with:
+
+```bash
+python main.py path/to/instance.json --solver <solver_name>
+```
+
+| Solver | Description |
+|--------|-------------|
+| **grasp** | GRASP: greedy randomized construction (RCL by completion time) + local search. |
+| **sa** | Simulated annealing with geometric cooling and optional reheating; random-neighbor moves. |
+| **es** | (μ+λ) evolution strategy with Rechenberg's 1/5 rule; mutation via random neighbor. |
+| **ils** | Iterated local search: repeated (perturb → local search), keep best. |
+| **ga** | Genetic algorithm: population, uniform crossover on machine assignment, mutation, (μ+λ) selection. |
+| **as** | Ant system: ants build solutions with pheromone + heuristic, local search, pheromone update. |
+| **mmas** | Max–min ant system: pheromone bounds, best-so-far update, periodic reinit. |
+| **acs** | Ant colony system: exploitation/exploration (q0), local pheromone update, global best update. |
+| **amts** | Ant multi-tour system: edge-usage penalty to encourage exploration. |
+| **combined** | Runs GRASP, SA, ACS, and ES in sequence; switches after stagnation (default 60 s). |
+
+Default solver is **combined**. Use `--time-limit N`, `--max-generations N`, `--gen-min-improvement`, or `--time-min-improvement` to control stopping (see `python main.py --help`).
