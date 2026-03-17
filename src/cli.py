@@ -76,4 +76,10 @@ def parse_args(args=None):
         default=False,
         help="Quiet mode: suppress progress output, print only final result",
     )
+    parser.add_argument(
+        "-fo", "--forever",
+        action="store_true",
+        default=False,
+        help="Run solver in a forever loop (until Ctrl+C is pressed), saving the best overall result",
+    )
     return parser.parse_args(args)

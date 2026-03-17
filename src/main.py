@@ -90,13 +90,13 @@ def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
             ) from e
         return MinizincSolver(solver_name="gecode", criteria=criteria)
     elif solver_name == "combined":
-        sub_solvers = [
-            ILSSolver(),
-            MaxMinAntSystem(),
-            RankedAntSystem(),
-            GraspSolver(),
-            EasAntSystem(),
-            AntMultiTourSystem(),
+        solver_factories = [
+            ILSSolver,
+            MaxMinAntSystem,
+            RankedAntSystem,
+            GraspSolver,
+            AntMultiTourSystem,
+            EvolutionStrategySolver,
         ]
         # If no min-improvement criterion was explicitly set, add a default
         # so each sub-solver switches after 60s of stagnation.
@@ -106,9 +106,9 @@ def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
         )
         combined_criteria = list(criteria)
         if not has_min_improvement:
-            combined_criteria.append(TimeMinImprovement(window=60.0, min_pct=0.01))
+            combined_criteria.append(TimeMinImprovement(window=300.0, min_pct=0.005))
         return CombinedSolver(
-            solvers=sub_solvers,
+            solver_factories=solver_factories,
             criteria=combined_criteria,
         )
     else:
@@ -135,11 +135,6 @@ def main():
     instance = SchedulingInstance(args.instance)
     log(f"Loaded {instance}")
 
-    criteria = build_criteria(args)
-    solver = build_solver(args.solver, criteria)
-    log(f"Running {args.solver} solver...")
-    log(f"Stopping criteria: {criteria}")
-
     on_new_best = None
     on_solver_switch = None
     prev_best = [float("inf")]
@@ -159,15 +154,72 @@ def main():
         def on_solver_switch(prev, nxt):
             log(f"  [solver switch]  {prev} -> {nxt}")
 
-    if args.solver == "combined":
-        solution, makespan, history = solver.solve(
-            instance, on_new_best=on_new_best, on_solver_switch=on_solver_switch
-        )
+    if args.forever:
+        log("Running in FOREVER mode. Press Ctrl+C to stop.")
+        best_overall_cost = float('inf')
+        best_overall_solution = None
+        best_overall_history = None
+        
+        iteration = 0
+        try:
+            while True:
+                iteration += 1
+                log(f"\n--- Forever Loop: Iteration {iteration} ---")
+                criteria = build_criteria(args)
+                solver = build_solver(args.solver, criteria)
+                log(f"Stopping criteria: {criteria}")
+                
+                prev_best[0] = float("inf")
+                
+                if args.solver == "combined":
+                    solution, makespan, history = solver.solve(
+                        instance, on_new_best=on_new_best, on_solver_switch=on_solver_switch
+                    )
+                else:
+                    solution, makespan, history = solver.solve(instance, on_new_best=on_new_best)
+                
+                log(f"Iteration {iteration} finished with makespan {makespan:.2f}")
+                if makespan < best_overall_cost:
+                    best_overall_cost = makespan
+                    best_overall_solution = solution
+                    best_overall_history = history
+                    log(f"*** NEW OVERALL BEST: {best_overall_cost:.2f} ***")
+                    
+                    if args.output:
+                        with open(args.output, "w") as f:
+                            json.dump(best_overall_solution.to_json(), f, indent=2)
+                        log(f"Saved new best to {args.output}")
+
+        except KeyboardInterrupt:
+            log("\nCtrl+C pressed! Stopping forever loop.")
+            if best_overall_solution is None:
+                log("No solution found before stopping.", min_level=0)
+                sys.exit(1)
+            solution = best_overall_solution
+            makespan = best_overall_cost
+            history = best_overall_history
+            # Mock solver.criteria to not crash when printing triggered later
+            class DummyCriteria:
+                triggered = False
+            solver.criteria = [DummyCriteria()]
     else:
-        solution, makespan, history = solver.solve(instance, on_new_best=on_new_best)
+        criteria = build_criteria(args)
+        solver = build_solver(args.solver, criteria)
+        log(f"Running {args.solver} solver...")
+        log(f"Stopping criteria: {criteria}")
+
+        if args.solver == "combined":
+            solution, makespan, history = solver.solve(
+                instance, on_new_best=on_new_best, on_solver_switch=on_solver_switch
+            )
+        else:
+            solution, makespan, history = solver.solve(instance, on_new_best=on_new_best)
 
     feasible, msg = solution.is_feasible()
-    triggered = [c for c in solver.criteria if c.triggered]
+    if not args.forever:
+        triggered = [c for c in solver.criteria if c.triggered]
+    else:
+        triggered = []
 
     log("--- Done ---", min_level=0)
     if feasible:

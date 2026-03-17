@@ -10,12 +10,12 @@ from solvers.base import SolverBase
 
 class TestCombinedSolver:
     def test_produces_feasible(self, small_instance):
-        solvers = [
-            GraspSolver(alpha=0.5),
-            SimulatedAnnealingSolver(initial_temp=50.0, cooling_rate=0.99),
+        factories = [
+            lambda: GraspSolver(alpha=0.5),
+            lambda: SimulatedAnnealingSolver(initial_temp=50.0, cooling_rate=0.99),
         ]
         combined = CombinedSolver(
-            solvers=solvers,
+            solver_factories=factories,
             criteria=[GenMinImprovement(window=5)],
         )
         solution, cost, history = combined.solve(small_instance)
@@ -26,12 +26,12 @@ class TestCombinedSolver:
 
     def test_runs_multiple_solvers(self, small_instance):
         """Verify the combined solver runs multiple sub-solvers."""
-        solvers = [
-            GraspSolver(alpha=0.5),
-            SimulatedAnnealingSolver(initial_temp=50.0, cooling_rate=0.99),
+        factories = [
+            lambda: GraspSolver(alpha=0.5),
+            lambda: SimulatedAnnealingSolver(initial_temp=50.0, cooling_rate=0.99),
         ]
         combined = CombinedSolver(
-            solvers=solvers,
+            solver_factories=factories,
             criteria=[GenMinImprovement(window=3, min_pct=0.5)],
         )
         solution, cost, history = combined.solve(small_instance)
@@ -41,12 +41,12 @@ class TestCombinedSolver:
     def test_solver_switch_callback(self, small_instance):
         """Verify on_solver_switch is called when switching solvers."""
         switches = []
-        solvers = [
-            GraspSolver(alpha=0.5),
-            SimulatedAnnealingSolver(initial_temp=50.0, cooling_rate=0.99),
+        factories = [
+            lambda: GraspSolver(alpha=0.5),
+            lambda: SimulatedAnnealingSolver(initial_temp=50.0, cooling_rate=0.99),
         ]
         combined = CombinedSolver(
-            solvers=solvers,
+            solver_factories=factories,
             criteria=[GenMinImprovement(window=3, min_pct=0.5)],
         )
         combined.solve(
@@ -58,8 +58,8 @@ class TestCombinedSolver:
 
     def test_triggered_criteria(self, small_instance):
         """Verify triggered flags are propagated back."""
-        solvers = [GraspSolver(alpha=0.5)]
+        factories = [lambda: GraspSolver(alpha=0.5)]
         criteria = [GenMinImprovement(window=3)]
-        combined = CombinedSolver(solvers=solvers, criteria=criteria)
+        combined = CombinedSolver(solver_factories=factories, criteria=criteria)
         combined.solve(small_instance)
         assert any(c.triggered for c in combined.criteria)
