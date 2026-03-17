@@ -4,7 +4,7 @@ import time
 from typing import Callable
 
 import numpy as np
-
+from solvers.cooling import SACoolingBase, GeometricCooling
 from models.instance import SchedulingInstance
 from models.solution import SchedulingSolution
 from stopping_criteria import StoppingCriterion
@@ -18,14 +18,14 @@ class SimulatedAnnealingSolver(SolverBase):
     def __init__(
         self,
         initial_temp: float = 100.0,
-        cooling_rate: float = 0.995,
+        cooling_rate: SACoolingBase = None,
         reheat_factor: float = 1.5,
         reheat_patience: int = 200,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(criteria)
         self.initial_temp = initial_temp
-        self.cooling_rate = cooling_rate
+        self.cooling_rate = cooling_rate if isinstance(cooling_rate, SACoolingBase) else GeometricCooling(cooling_rate=0.995)
         self.reheat_factor = reheat_factor
         self.reheat_patience = reheat_patience
 
@@ -81,7 +81,7 @@ class SimulatedAnnealingSolver(SolverBase):
             history.append(best_cost)
 
             # Geometric cooling
-            temp *= self.cooling_rate
+            temp = self.cooling_rate.get_temperature(temp, gen, self.initial_temp)
 
             # Reheat if stagnating
             if no_improve_count >= self.reheat_patience:

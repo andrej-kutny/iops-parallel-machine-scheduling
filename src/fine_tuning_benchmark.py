@@ -16,7 +16,8 @@ print(f"Results will be saved to: {BASE_PATH}")
 
 from solvers import (
     EvolutionStrategySolver, GeneticAlgorithmSolver, AntColonySystem, 
-    AntMultiTourSystem, AntSystem, GraspSolver, ILSSolver, EasAntSystem, RankedAntSystem
+    AntMultiTourSystem, AntSystem, GraspSolver, ILSSolver, EasAntSystem, RankedAntSystem,
+    LogarithmicCooling, LinearCooling, GeometricCooling, SimulatedAnnealingSolver
 )
 
 import numpy as np
@@ -25,6 +26,8 @@ import os
 import json
 if not os.path.isdir(BASE_PATH):
     os.makedirs(BASE_PATH)
+
+
 
 # Solver names and folder mappings
 SOLVER_NAMES = {
@@ -37,6 +40,9 @@ SOLVER_NAMES = {
     'ranked_ant_system': 'ranked_ant_system',
     'ant_colony_system': 'ant_colony_system',
     'ant_multi_tour_system': 'ant_multi_tour_system',
+    'simulated_annealing_geometric': 'simulated_annealing_geometric',
+    'simulated_annealing_logarithmic': 'simulated_annealing_logarithmic',
+    'simulated_annealing_linear': 'simulated_annealing_linear',
 }
 
 # Create solver-specific folders
@@ -47,7 +53,7 @@ for solver_folder in SOLVER_NAMES.values():
 
 # Configuration
 INSTANCE_PATH = "src/data/357_15_146_H.json"
-TIMEOUT_PER_SOLVER = 10  # 30 minutes in seconds
+TIMEOUT_PER_SOLVER = 1800
 N_ITERATIONS_PER_CONFIG = 1  # Number of times to repeat each configuration
 
 # Criteria parameter ranges
@@ -115,6 +121,23 @@ ALGORITHM_PARAMS = {
         'beta': np.linspace(1, 5, 5),
         'rho': np.linspace(0.1, 0.9, 5),
         'q_tours': np.linspace(1, 20, 5).astype("int"),
+    },
+    'simulated_annealing_geometric': {
+        'initial_temp': np.linspace(50, 300, 5).astype("int"),
+        'cooling_rate_param': np.linspace(0.05, 0.995, 5),
+        'reheat_factor': np.linspace(0.6, 3.0, 5),
+        'reheat_patience': np.linspace(50, 1000, 5).astype("int"),
+    },
+    'simulated_annealing_logarithmic': {
+        'initial_temp': np.linspace(50, 300, 5).astype("int"),
+        'reheat_factor': np.linspace(0.6, 3.0, 5),
+        'reheat_patience': np.linspace(50, 1000, 5).astype("int"),
+    },
+    'simulated_annealing_linear': {
+        'initial_temp': np.linspace(50, 300, 5).astype("int"),
+        'cooling_rate_iterations': np.linspace(700, 10000, 5).astype("int"),
+        'reheat_factor': np.linspace(0.6, 3.0, 5),
+        'reheat_patience': np.linspace(50, 1000, 5).astype("int"),
     },
 }
 
@@ -419,6 +442,105 @@ def tune_ant_multi_tour_system(solver_name, criteria, start_time, timeout_second
     return text, False
 
 
+def tune_simulated_annealing_geometric(solver_name, criteria, start_time, timeout_seconds):
+    """Parameter tuning for Simulated Annealing with Geometric Cooling."""
+    text = ""
+    params = ALGORITHM_PARAMS['simulated_annealing_geometric']
+    
+    for iter in range(N_ITERATIONS_PER_CONFIG):
+        if time.time() - start_time > timeout_seconds:
+            return text, True
+        for initial_temp in params['initial_temp']:
+            if time.time() - start_time > timeout_seconds:
+                return text, True
+            for cooling_rate_param in params['cooling_rate_param']:
+                if time.time() - start_time > timeout_seconds:
+                    return text, True
+                for reheat_factor in params['reheat_factor']:
+                    if time.time() - start_time > timeout_seconds:
+                        return text, True
+                    for reheat_patience in params['reheat_patience']:
+                        if time.time() - start_time > timeout_seconds:
+                            return text, True
+                        sa_solver = SimulatedAnnealingSolver(
+                            initial_temp=initial_temp,
+                            cooling_rate=GeometricCooling(cooling_rate_param),
+                            reheat_factor=reheat_factor,
+                            reheat_patience=reheat_patience,
+                            criteria=criteria
+                        )
+                        e1, e2, e3 = sa_solver.solve(instance)
+                        update_best_solution(solver_name, e1, e2, e3)
+                        text += f"  initial_temp={initial_temp}, cooling_rate={cooling_rate_param}, reheat_factor={reheat_factor}, reheat_patience={reheat_patience}, cost={e2}; best_cost={best_solution_state[solver_name]['best_cost']}\n"
+    
+    return text, False
+
+
+def tune_simulated_annealing_logarithmic(solver_name, criteria, start_time, timeout_seconds):
+    """Parameter tuning for Simulated Annealing with Logarithmic Cooling."""
+    text = ""
+    params = ALGORITHM_PARAMS['simulated_annealing_logarithmic']
+    
+    for iter in range(N_ITERATIONS_PER_CONFIG):
+        if time.time() - start_time > timeout_seconds:
+            return text, True
+        for initial_temp in params['initial_temp']:
+            if time.time() - start_time > timeout_seconds:
+                return text, True
+            for reheat_factor in params['reheat_factor']:
+                if time.time() - start_time > timeout_seconds:
+                    return text, True
+                for reheat_patience in params['reheat_patience']:
+                    if time.time() - start_time > timeout_seconds:
+                        return text, True
+                    sa_solver = SimulatedAnnealingSolver(
+                        initial_temp=initial_temp,
+                        cooling_rate=LogarithmicCooling(),
+                        reheat_factor=reheat_factor,
+                        reheat_patience=reheat_patience,
+                        criteria=criteria
+                    )
+                    e1, e2, e3 = sa_solver.solve(instance)
+                    update_best_solution(solver_name, e1, e2, e3)
+                    text += f"  initial_temp={initial_temp}, reheat_factor={reheat_factor}, reheat_patience={reheat_patience}, cost={e2}; best_cost={best_solution_state[solver_name]['best_cost']}\n"
+    
+    return text, False
+
+
+def tune_simulated_annealing_linear(solver_name, criteria, start_time, timeout_seconds):
+    """Parameter tuning for Simulated Annealing with Linear Cooling."""
+    text = ""
+    params = ALGORITHM_PARAMS['simulated_annealing_linear']
+    
+    for iter in range(N_ITERATIONS_PER_CONFIG):
+        if time.time() - start_time > timeout_seconds:
+            return text, True
+        for initial_temp in params['initial_temp']:
+            if time.time() - start_time > timeout_seconds:
+                return text, True
+            for cooling_rate_iterations in params['cooling_rate_iterations']:
+                if time.time() - start_time > timeout_seconds:
+                    return text, True
+                for reheat_factor in params['reheat_factor']:
+                    if time.time() - start_time > timeout_seconds:
+                        return text, True
+                    for reheat_patience in params['reheat_patience']:
+                        if time.time() - start_time > timeout_seconds:
+                            return text, True
+                        sa_solver = SimulatedAnnealingSolver(
+                            initial_temp=initial_temp,
+                            cooling_rate=LinearCooling(cooling_rate_iterations),
+                            reheat_factor=reheat_factor,
+                            reheat_patience=reheat_patience,
+                            criteria=criteria
+                        )
+                        e1, e2, e3 = sa_solver.solve(instance)
+                        update_best_solution(solver_name, e1, e2, e3)
+                        text += f"  initial_temp={initial_temp}, cooling_rate_iterations={cooling_rate_iterations}, reheat_factor={reheat_factor}, reheat_patience={reheat_patience}, cost={e2}; best_cost={best_solution_state[solver_name]['best_cost']}\n"
+    
+    return text, False
+
+
 def save_solver_best_solution(solver_name):
     """Save best solution for a specific solver to its folder."""
     if best_solution_state[solver_name]['best'] is not None:
@@ -452,7 +574,7 @@ def save_solver_best_solution(solver_name):
 # Main parameter tuning loop
 print("Starting parameter tuning for all algorithms...")
 print(f"Criteria configuration: {CRITERIA_CONFIG}")
-print(f"Timeout per solver: {TIMEOUT_PER_SOLVER} seconds (30 minutes)\n")
+print(f"Timeout per solver: {TIMEOUT_PER_SOLVER} seconds\n")
 
 # List of solvers and their tuning functions
 SOLVER_TUNING_FUNCTIONS = {
@@ -465,6 +587,9 @@ SOLVER_TUNING_FUNCTIONS = {
     'ranked_ant_system': tune_ranked_ant_system,
     'ant_colony_system': tune_ant_colony_system,
     'ant_multi_tour_system': tune_ant_multi_tour_system,
+    'simulated_annealing_geometric': tune_simulated_annealing_geometric,
+    'simulated_annealing_logarithmic': tune_simulated_annealing_logarithmic,
+    'simulated_annealing_linear': tune_simulated_annealing_linear,
 }
 
 # Iterate over solvers
