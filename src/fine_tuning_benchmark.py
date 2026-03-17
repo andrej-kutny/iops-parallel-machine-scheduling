@@ -25,6 +25,7 @@ import argparse
 import csv
 import json
 import os
+import sys
 import time
 from datetime import datetime
 
@@ -55,9 +56,16 @@ from solvers import (
 )
 
 try:
-    from minizinc_cp import MinizincSolver
-
-    HAS_MINIZINC = True
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        import minizinc
+    
+    if getattr(minizinc, "default_driver", None) is None:
+        HAS_MINIZINC = False
+    else:
+        from minizinc_cp import MinizincSolver
+        HAS_MINIZINC = True
 except Exception:
     HAS_MINIZINC = False
 
@@ -75,7 +83,7 @@ def parse_args():
         "algorithms",
         nargs="*",
         default=[],
-        help="Algorithms to tune (empty = all)",
+        help=f"Algorithms to tune (empty = all). Choices: {', '.join(ALGORITHMS.keys())}",
     )
     p.add_argument(
         "-at",
@@ -787,6 +795,13 @@ def fine_tune_algorithm(
 
 def main():
     args = parse_args()
+
+    if not os.path.isfile(args.instance):
+        print(f"ERROR: Instance file not found: '{args.instance}'")
+        if args.instance in ALGORITHMS:
+            print("It looks like you passed an algorithm name instead of a file path.")
+            print("Usage: python src/fine_tuning_benchmark.py <path_to_instance.json> [algorithms...]")
+        sys.exit(1)
 
     instance = SchedulingInstance(args.instance)
     instance_label = os.path.basename(args.instance)
