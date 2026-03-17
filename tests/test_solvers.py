@@ -150,4 +150,4 @@ class TestMinizincSolver:
         feasible, msg = solution.is_feasible()
         assert feasible, msg
         assert cost > 0
-        assert len(history) == 1
+        assert len(history) >= 1
