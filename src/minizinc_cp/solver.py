@@ -23,7 +23,6 @@ Requirements:
 
 from __future__ import annotations
 
-import asyncio
 import os
 import time
 from datetime import timedelta
@@ -154,85 +153,6 @@ def solve_minizinc(
     return solution, float(makespan)
 
 
-def solve_minizinc_with_intermediates(
-    instance: "SchedulingInstance",
-    solver_name: str = "gecode",
-    time_limit_seconds: float | None = None,
-    on_new_best=None,
-) -> tuple["SchedulingSolution", float, list[float]]:
-    """
-    Solve with MiniZinc, streaming intermediate improving solutions.
-
-    Uses the async ``Instance.solutions(intermediate_solutions=True)``
-    generator to capture every improving bound the CP solver finds.
-    Each improvement triggers `on_new_best(gen, solution, makespan, elapsed)`.
-
-    Returns:
-        (best_solution, best_makespan, history) — history contains the
-        makespan of every intermediate improving solution.
-    """
-
-    async def _run():
-        Instance = minizinc.Instance
-        Model = minizinc.Model
-        Solver = minizinc.Solver
-
-        model_path = os.path.join(os.path.dirname(__file__), "scheduling.mzn")
-        model = Model(model_path)
-        solver = Solver.lookup(solver_name)
-        mz_instance = Instance(solver, model)
-
-        data = _instance_to_minizinc_data(instance)
-        for key, value in data.items():
-            mz_instance[key] = value
-
-        kwargs = {"intermediate_solutions": True}
-        if time_limit_seconds is not None and time_limit_seconds > 0:
-            kwargs["time_limit"] = timedelta(seconds=time_limit_seconds)
-
-        best_sol = None
-        best_makespan = float("inf")
-        history: list[float] = []
-        gen = 0
-        wall_start = time.monotonic()
-
-        async for result in mz_instance.solutions(**kwargs):
-            if result.status.name not in ("SATISFIED", "OPTIMAL_SOLUTION"):
-                continue
-
-            try:
-                assign = list(result["assign"])
-                start = list(result["start"])
-                end = list(result["end"])
-            except (KeyError, TypeError):
-                # Final status-only result has no variable assignments
-                continue
-
-            makespan = float(max(end))
-            if makespan < best_makespan:
-                best_makespan = makespan
-                schedule = _result_to_schedule(instance, assign, start)
-                best_sol = SchedulingSolution(schedule, instance)
-                history.append(best_makespan)
-                gen += 1
-                elapsed = time.monotonic() - wall_start
-                if on_new_best is not None:
-                    on_new_best(gen, best_sol, best_makespan, elapsed)
-
-        return best_sol, best_makespan, history
-
-    best_sol, best_makespan, history = asyncio.run(_run())
-
-    # Fallback if no solution was found
-    if best_sol is None:
-        rng = np.random.default_rng()
-        best_sol = SolverBase._random_solution(instance, rng)
-        best_makespan = float(best_sol.compute_makespan())
-        history = [best_makespan]
-
-    return best_sol, best_makespan, history
-
-
 class MinizincSolver:
     """
     CP solver using MiniZinc.
@@ -275,12 +195,18 @@ class MinizincSolver:
         if time_limit is None:
             time_limit = 60.0
 
-        solution, makespan, history = solve_minizinc_with_intermediates(
+        start = time.monotonic()
+        solution, makespan = solve_minizinc(
             instance,
             solver_name=self.solver_name,
             time_limit_seconds=time_limit,
-            on_new_best=on_new_best,
         )
+        elapsed = time.monotonic() - start
+
+        if on_new_best is not None:
+            on_new_best(0, solution, makespan, elapsed)
+
+        history = [makespan]
 
         for c in self.criteria:
             c.check(history)
