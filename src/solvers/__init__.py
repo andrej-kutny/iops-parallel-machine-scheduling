@@ -9,3 +9,4 @@ from .max_min_ant_system import MaxMinAntSystem
 from .ant_colony_system import AntColonySystem
 from .ant_multi_tour_system import AntMultiTourSystem
 from .combined import CombinedSolver
+from .cooling import GeometricCooling, LinearCooling, LogarithmicCooling
