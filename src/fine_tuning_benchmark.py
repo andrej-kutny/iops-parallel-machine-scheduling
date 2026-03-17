@@ -693,7 +693,7 @@ def fine_tune_algorithm(
             solution, cost, history = solver.solve(instance, on_new_best=_on_new_best)
         except Exception as exc:
             print(f"ERROR: {exc}")
-            continue
+            break
         run_time = time.monotonic() - run_start
         n_gens = len(history)
 
