@@ -128,6 +128,7 @@ python main.py path/to/instance.json --solver <solver_name>
 | **mmas** | Max–min ant system: pheromone bounds, best-so-far update, periodic reinit. |
 | **acs** | Ant colony system: exploitation/exploration (q0), local pheromone update, global best update. |
 | **amts** | Ant multi-tour system: edge-usage penalty to encourage exploration. |
+| **minizinc** | CP solver via MiniZinc (requires `pip install minizinc`, MiniZinc 2.6+ and e.g. Gecode). |
 | **combined** | Runs GRASP, SA, ACS, and ES in sequence; switches after stagnation (default 60 s). |
 
-Default solver is **combined**. Use `--time-limit N`, `--max-generations N`, `--gen-min-improvement`, or `--time-min-improvement` to control stopping (see `python main.py --help`).
+Default solver is **combined**. For **minizinc**, install the optional dependency: `pip install -e ".[minizinc]"` and install [MiniZinc](https://www.minizinc.org/) with a backend solver (e.g. Gecode). Use `--time-limit N`, `--max-generations N`, `--gen-min-improvement`, or `--time-min-improvement` to control stopping (see `python main.py --help`).

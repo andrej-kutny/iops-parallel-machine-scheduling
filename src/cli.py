@@ -11,7 +11,7 @@ def parse_args(args=None):
     )
     parser.add_argument(
         "--solver",
-        choices=["grasp", "sa", "es", "ils", "ga", "as", "mmas", "acs", "amts", "combined"],
+        choices=["grasp", "sa", "es", "ils", "ga", "as", "mmas", "acs", "amts", "minizinc", "combined"],
         default="combined",
         help="Solver to use (default: combined). See README for descriptions.",
     )
