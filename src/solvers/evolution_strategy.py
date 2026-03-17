@@ -14,11 +14,15 @@ from solvers.base import SolverBase, VerboseCallback
 class EvolutionStrategySolver(SolverBase):
     """(μ+λ) Evolution Strategy with Rechenberg's 1/5 success rule."""
 
+    DEFAULT_MU = 18
+    DEFAULT_LAM = 54
+    DEFAULT_C = 0.8595
+
     def __init__(
         self,
-        mu: int = 10,
-        lam: int = 50,
-        c: float = 0.85,
+        mu: int = DEFAULT_MU,
+        lam: int = DEFAULT_LAM,
+        c: float = DEFAULT_C,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(criteria)

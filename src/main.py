@@ -14,7 +14,7 @@ from solvers.simulated_annealing import SimulatedAnnealingSolver
 from solvers.evolution_strategy import EvolutionStrategySolver
 from solvers.iterated_local_search import ILSSolver
 from solvers.genetic_algorithm import GeneticAlgorithmSolver
-from solvers.ant_system import AntSystem
+from solvers.ant_system import AntSystem, RankedAntSystem, EasAntSystem
 from solvers.max_min_ant_system import MaxMinAntSystem
 from solvers.ant_colony_system import AntColonySystem
 from solvers.ant_multi_tour_system import AntMultiTourSystem
@@ -64,36 +64,23 @@ def build_criteria(args) -> list[StoppingCriterion]:
 
 def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
     if solver_name == "grasp":
-        return GraspSolver(alpha=0.5, criteria=criteria)
+        return GraspSolver(criteria=criteria)
     elif solver_name == "sa":
-        return SimulatedAnnealingSolver(
-            initial_temp=100.0, cooling_rate=0.995, criteria=criteria
-        )
+        return SimulatedAnnealingSolver(criteria=criteria)
     elif solver_name == "es":
-        return EvolutionStrategySolver(mu=10, lam=50, c=0.85, criteria=criteria)
+        return EvolutionStrategySolver(criteria=criteria)
     elif solver_name == "as":
-        return AntSystem(n_ants=20, alpha=1.0, beta=2.0, rho=0.1, criteria=criteria)
+        return AntSystem(criteria=criteria)
     elif solver_name == "mmas":
-        return MaxMinAntSystem(
-            n_ants=20, alpha=1.0, beta=2.0, rho=0.1,
-            reinit_frequency=100, criteria=criteria
-        )
+        return MaxMinAntSystem(criteria=criteria)
     elif solver_name == "acs":
-        return AntColonySystem(
-            n_ants=20, alpha=1.0, beta=2.0, rho=0.1,
-            q0=0.9, local_decay=0.1, criteria=criteria
-        )
+        return AntColonySystem(criteria=criteria)
     elif solver_name == "amts":
-        return AntMultiTourSystem(
-            n_ants=20, alpha=1.0, beta=2.0, rho=0.1,
-            q_tours=5, criteria=criteria
-        )
+        return AntMultiTourSystem(criteria=criteria)
     elif solver_name == "ils":
-        return ILSSolver(perturbation_strength=5, criteria=criteria)
+        return ILSSolver(criteria=criteria)
     elif solver_name == "ga":
-        return GeneticAlgorithmSolver(
-            population_size=30, offspring_per_generation=30, mutation_strength=2, criteria=criteria
-        )
+        return GeneticAlgorithmSolver(criteria=criteria)
     elif solver_name == "minizinc":
         try:
             from minizinc_cp import MinizincSolver
@@ -104,10 +91,12 @@ def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
         return MinizincSolver(solver_name="gecode", criteria=criteria)
     elif solver_name == "combined":
         sub_solvers = [
-            GraspSolver(alpha=0.5),
-            SimulatedAnnealingSolver(initial_temp=100.0, cooling_rate=0.995),
-            AntColonySystem(n_ants=20, alpha=1.0, beta=2.0, rho=0.1, q0=0.9),
-            EvolutionStrategySolver(mu=10, lam=50, c=0.85),
+            ILSSolver(),
+            MaxMinAntSystem(),
+            RankedAntSystem(),
+            GraspSolver(),
+            EasAntSystem(),
+            AntMultiTourSystem(),
         ]
         # If no min-improvement criterion was explicitly set, add a default
         # so each sub-solver switches after 60s of stagnation.
@@ -117,7 +106,7 @@ def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
         )
         combined_criteria = list(criteria)
         if not has_min_improvement:
-            combined_criteria.append(TimeMinImprovement(window=60.0, min_pct=0.005))
+            combined_criteria.append(TimeMinImprovement(window=60.0, min_pct=0.01))
         return CombinedSolver(
             solvers=sub_solvers,
             criteria=combined_criteria,

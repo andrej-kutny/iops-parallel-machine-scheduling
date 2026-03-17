@@ -15,17 +15,22 @@ from solvers.base import SolverBase, VerboseCallback
 class SimulatedAnnealingSolver(SolverBase):
     """Simulated Annealing with geometric cooling and optional reheating."""
 
+    DEFAULT_INITIAL_TEMP = 177.9708
+    DEFAULT_COOLING_RATE_PARAM = 0.9401
+    DEFAULT_REHEAT_FACTOR = 1.2759
+    DEFAULT_REHEAT_PATIENCE = 151
+
     def __init__(
         self,
-        initial_temp: float = 100.0,
+        initial_temp: float = DEFAULT_INITIAL_TEMP,
         cooling_rate: SACoolingBase = None,
-        reheat_factor: float = 1.5,
-        reheat_patience: int = 200,
+        reheat_factor: float = DEFAULT_REHEAT_FACTOR,
+        reheat_patience: int = DEFAULT_REHEAT_PATIENCE,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(criteria)
         self.initial_temp = initial_temp
-        self.cooling_rate = cooling_rate if isinstance(cooling_rate, SACoolingBase) else GeometricCooling(cooling_rate=0.995)
+        self.cooling_rate = cooling_rate if isinstance(cooling_rate, SACoolingBase) else GeometricCooling(cooling_rate=self.DEFAULT_COOLING_RATE_PARAM)
         self.reheat_factor = reheat_factor
         self.reheat_patience = reheat_patience
 

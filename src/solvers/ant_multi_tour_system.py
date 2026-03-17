@@ -14,13 +14,19 @@ from solvers.base import VerboseCallback
 class AntMultiTourSystem(ACOSolverBase):
     """Ant Multi-Tour System. Tracks assignment usage and penalizes frequently used pairs."""
 
+    DEFAULT_N_ANTS = 20
+    DEFAULT_ALPHA = 1.1048
+    DEFAULT_BETA = 1.9904
+    DEFAULT_RHO = 0.1057
+    DEFAULT_Q_TOURS = 3
+
     def __init__(
         self,
-        n_ants: int = 20,
-        alpha: float = 1.0,
-        beta: float = 2.0,
-        rho: float = 0.1,
-        q_tours: int = 5,
+        n_ants: int = DEFAULT_N_ANTS,
+        alpha: float = DEFAULT_ALPHA,
+        beta: float = DEFAULT_BETA,
+        rho: float = DEFAULT_RHO,
+        q_tours: int = DEFAULT_Q_TOURS,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(n_ants, alpha, beta, rho, criteria)

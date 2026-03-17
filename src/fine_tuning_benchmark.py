@@ -209,7 +209,7 @@ def _register(key, name, defaults, config_gen, solver_factory):
 
 # --- GRASP -----------------------------------------------------------------
 
-_GRASP_DEFAULTS = {"alpha": 0.5}
+_GRASP_DEFAULTS = {"alpha": 0.4333}
 
 
 def _grasp_config(defaults, m):
@@ -225,7 +225,7 @@ _register("grasp", "GRASP", _GRASP_DEFAULTS, _grasp_config, _grasp_factory)
 
 # --- Evolution Strategy ----------------------------------------------------
 
-_ES_DEFAULTS = {"mu": 20, "lam": 50, "c": 0.85}
+_ES_DEFAULTS = {"mu": 18, "lam": 54, "c": 0.8595}
 
 
 def _es_config(defaults, m):
@@ -251,7 +251,7 @@ _register("evolution_strategy", "Evolution Strategy", _ES_DEFAULTS, _es_config, 
 
 # --- Genetic Algorithm -----------------------------------------------------
 
-_GA_DEFAULTS = {"population_size": 50, "offspring_per_generation": 3, "mutation_strength": 4}
+_GA_DEFAULTS = {"population_size": 53, "offspring_per_generation": 3, "mutation_strength": 2}
 
 
 def _ga_config(defaults, m):
@@ -276,7 +276,7 @@ _register("genetic_algorithm", "Genetic Algorithm", _GA_DEFAULTS, _ga_config, _g
 
 # --- ILS -------------------------------------------------------------------
 
-_ILS_DEFAULTS = {"perturbation_strength": 5}
+_ILS_DEFAULTS = {"perturbation_strength": 4}
 
 
 def _ils_config(defaults, m):
@@ -294,7 +294,7 @@ _register("ils", "Iterated Local Search", _ILS_DEFAULTS, _ils_config, _ils_facto
 
 # --- Ant System ------------------------------------------------------------
 
-_AS_DEFAULTS = {"n_ants": 20, "alpha": 1.0, "beta": 2.0, "rho": 0.1, "q_ct": 1.0}
+_AS_DEFAULTS = {"n_ants": 19, "alpha": 1.1999, "beta": 2.0252, "rho": 0.1103, "q_ct": 1.0725}
 
 
 def _as_config(defaults, m):
@@ -319,7 +319,7 @@ _register("ant_system", "Ant System", _AS_DEFAULTS, _as_config, _as_factory)
 
 # --- EAS Ant System --------------------------------------------------------
 
-_EAS_DEFAULTS = {"n_ants": 20, "alpha": 1.0, "beta": 2.0, "rho": 0.1, "q_ct": 1.0, "sigma": 1.0}
+_EAS_DEFAULTS = {"n_ants": 19, "alpha": 1.2102, "beta": 1.5898, "rho": 0.0965, "q_ct": 0.8518, "sigma": 0.9436}
 
 
 def _eas_config(defaults, m):
@@ -345,7 +345,7 @@ _register("eas_ant_system", "Elitist Ant System", _EAS_DEFAULTS, _eas_config, _e
 
 # --- Ranked Ant System -----------------------------------------------------
 
-_RAS_DEFAULTS = {"n_ants": 20, "alpha": 1.0, "beta": 2.0, "rho": 0.1, "q_ct": 1.0}
+_RAS_DEFAULTS = {"n_ants": 23, "alpha": 0.8490, "beta": 2.0829, "rho": 0.0963, "q_ct": 0.9129}
 
 
 def _ras_config(defaults, m):
@@ -370,7 +370,7 @@ _register("ranked_ant_system", "Ranked Ant System", _RAS_DEFAULTS, _ras_config, 
 
 # --- Max-Min Ant System ----------------------------------------------------
 
-_MMAS_DEFAULTS = {"n_ants": 20, "alpha": 1.0, "beta": 2.0, "rho": 0.1, "reinit_frequency": 100}
+_MMAS_DEFAULTS = {"n_ants": 25, "alpha": 0.9331, "beta": 2.2477, "rho": 0.1293, "reinit_frequency": 124}
 
 
 def _mmas_config(defaults, m):
@@ -395,7 +395,7 @@ _register("max_min_ant_system", "Max-Min Ant System", _MMAS_DEFAULTS, _mmas_conf
 
 # --- Ant Colony System -----------------------------------------------------
 
-_ACS_DEFAULTS = {"n_ants": 20, "alpha": 1.0, "beta": 2.0, "rho": 0.1, "q0": 0.9, "local_decay": 0.1}
+_ACS_DEFAULTS = {"n_ants": 16, "alpha": 1.2944, "beta": 1.4080, "rho": 0.0959, "q0": 0.8729, "local_decay": 0.1082}
 
 
 def _acs_config(defaults, m):
@@ -421,7 +421,7 @@ _register("ant_colony_system", "Ant Colony System", _ACS_DEFAULTS, _acs_config, 
 
 # --- Ant Multi-Tour System -------------------------------------------------
 
-_AMTS_DEFAULTS = {"n_ants": 20, "alpha": 1.0, "beta": 2.0, "rho": 0.1, "q_tours": 5}
+_AMTS_DEFAULTS = {"n_ants": 20, "alpha": 1.1048, "beta": 1.9904, "rho": 0.1057, "q_tours": 3}
 
 
 def _amts_config(defaults, m):
@@ -447,10 +447,10 @@ _register("ant_multi_tour_system", "Ant Multi-Tour System", _AMTS_DEFAULTS, _amt
 # --- Simulated Annealing (Geometric) --------------------------------------
 
 _SA_GEO_DEFAULTS = {
-    "initial_temp": 150.0,
-    "cooling_rate_param": 0.995,
-    "reheat_factor": 1.5,
-    "reheat_patience": 200,
+    "initial_temp": 177.9708,
+    "cooling_rate_param": 0.9401,
+    "reheat_factor": 1.2759,
+    "reheat_patience": 151,
 }
 
 
@@ -479,9 +479,9 @@ _register("sa_geometric", "SA Geometric Cooling", _SA_GEO_DEFAULTS, _sa_geo_conf
 # --- Simulated Annealing (Logarithmic) ------------------------------------
 
 _SA_LOG_DEFAULTS = {
-    "initial_temp": 150.0,
-    "reheat_factor": 1.5,
-    "reheat_patience": 200,
+    "initial_temp": 97.6095,
+    "reheat_factor": 1.1277,
+    "reheat_patience": 185,
 }
 
 
@@ -509,10 +509,10 @@ _register("sa_logarithmic", "SA Logarithmic Cooling", _SA_LOG_DEFAULTS, _sa_log_
 # --- Simulated Annealing (Linear) -----------------------------------------
 
 _SA_LIN_DEFAULTS = {
-    "initial_temp": 150.0,
-    "cooling_rate_iterations": 5000,
-    "reheat_factor": 1.5,
-    "reheat_patience": 200,
+    "initial_temp": 167.9693,
+    "cooling_rate_iterations": 4388,
+    "reheat_factor": 1.2080,
+    "reheat_patience": 187,
 }
 
 
