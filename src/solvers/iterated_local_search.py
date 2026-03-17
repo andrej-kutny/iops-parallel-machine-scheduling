@@ -21,9 +21,11 @@ from solvers.base import SolverBase, VerboseCallback
 class ILSSolver(SolverBase):
     """Iterated Local Search: repeated (perturb → local search), keep best."""
 
+    DEFAULT_PERTURBATION_STRENGTH = 4
+
     def __init__(
         self,
-        perturbation_strength: int = 5,
+        perturbation_strength: int = DEFAULT_PERTURBATION_STRENGTH,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(criteria)

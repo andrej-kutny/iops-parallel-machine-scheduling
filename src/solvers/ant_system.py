@@ -12,13 +12,19 @@ from solvers.base import VerboseCallback
 class AntSystem(ACOSolverBase):
     """Standard Ant System – all ants deposit pheromone proportional to solution quality."""
 
+    DEFAULT_N_ANTS = 19
+    DEFAULT_ALPHA = 1.1999
+    DEFAULT_BETA = 2.0252
+    DEFAULT_RHO = 0.1103
+    DEFAULT_Q_CT = 1.0725
+
     def __init__(
         self,
-        n_ants: int = 20,
-        alpha: float = 1.0,
-        beta: float = 2.0,
-        rho: float = 0.1,
-        q_ct: float = 1.0,
+        n_ants: int = DEFAULT_N_ANTS,
+        alpha: float = DEFAULT_ALPHA,
+        beta: float = DEFAULT_BETA,
+        rho: float = DEFAULT_RHO,
+        q_ct: float = DEFAULT_Q_CT,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(n_ants, alpha, beta, rho, criteria)
@@ -69,13 +75,19 @@ class AntSystem(ACOSolverBase):
 class RankedAntSystem(ACOSolverBase):
     """Rank-based Ant System – only the top w ants deposit, weighted by rank."""
 
+    DEFAULT_N_ANTS = 23
+    DEFAULT_ALPHA = 0.8490
+    DEFAULT_BETA = 2.0829
+    DEFAULT_RHO = 0.0963
+    DEFAULT_Q_CT = 0.9129
+
     def __init__(
         self,
-        n_ants: int = 20,
-        alpha: float = 1.0,
-        beta: float = 2.0,
-        rho: float = 0.1,
-        q_ct: float = 1.0,
+        n_ants: int = DEFAULT_N_ANTS,
+        alpha: float = DEFAULT_ALPHA,
+        beta: float = DEFAULT_BETA,
+        rho: float = DEFAULT_RHO,
+        q_ct: float = DEFAULT_Q_CT,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(n_ants, alpha, beta, rho, criteria)
@@ -131,14 +143,21 @@ class RankedAntSystem(ACOSolverBase):
 class EasAntSystem(ACOSolverBase):
     """Elitist Ant System – all ants deposit plus an extra bonus for the best-so-far solution."""
 
+    DEFAULT_N_ANTS = 19
+    DEFAULT_ALPHA = 1.2102
+    DEFAULT_BETA = 1.5898
+    DEFAULT_RHO = 0.0965
+    DEFAULT_Q_CT = 0.8518
+    DEFAULT_SIGMA = 0.9436
+
     def __init__(
         self,
-        n_ants: int = 20,
-        alpha: float = 1.0,
-        beta: float = 2.0,
-        rho: float = 0.1,
-        q_ct: float = 1.0,
-        sigma: float = 1.0,
+        n_ants: int = DEFAULT_N_ANTS,
+        alpha: float = DEFAULT_ALPHA,
+        beta: float = DEFAULT_BETA,
+        rho: float = DEFAULT_RHO,
+        q_ct: float = DEFAULT_Q_CT,
+        sigma: float = DEFAULT_SIGMA,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(n_ants, alpha, beta, rho, criteria)

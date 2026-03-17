@@ -15,14 +15,21 @@ from solvers.base import VerboseCallback
 class AntColonySystem(ACOSolverBase):
     """Ant Colony System with exploitation/exploration balance and local pheromone updates."""
 
+    DEFAULT_N_ANTS = 16
+    DEFAULT_ALPHA = 1.2944
+    DEFAULT_BETA = 1.4080
+    DEFAULT_RHO = 0.0959
+    DEFAULT_Q0 = 0.8729
+    DEFAULT_LOCAL_DECAY = 0.1082
+
     def __init__(
         self,
-        n_ants: int = 20,
-        alpha: float = 1.0,
-        beta: float = 2.0,
-        rho: float = 0.1,
-        q0: float = 0.9,
-        local_decay: float = 0.1,
+        n_ants: int = DEFAULT_N_ANTS,
+        alpha: float = DEFAULT_ALPHA,
+        beta: float = DEFAULT_BETA,
+        rho: float = DEFAULT_RHO,
+        q0: float = DEFAULT_Q0,
+        local_decay: float = DEFAULT_LOCAL_DECAY,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(n_ants, alpha, beta, rho, criteria)

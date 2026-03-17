@@ -12,7 +12,9 @@ from solvers.base import SolverBase
 class GraspSolver(SolverBase):
     """GRASP metaheuristic for parallel machine scheduling."""
 
-    def __init__(self, alpha: float = 0.5, criteria: list[StoppingCriterion] | None = None):
+    DEFAULT_ALPHA = 0.4333
+
+    def __init__(self, alpha: float = DEFAULT_ALPHA, criteria: list[StoppingCriterion] | None = None):
         super().__init__(criteria)
         self.alpha = alpha
 

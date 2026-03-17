@@ -48,11 +48,15 @@ def _crossover(parent1: SchedulingSolution, parent2: SchedulingSolution, instanc
 class GeneticAlgorithmSolver(SolverBase):
     """Genetic Algorithm: population, uniform crossover (machine assignment), mutation (random neighbor), (mu+lam) selection."""
 
+    DEFAULT_POPULATION_SIZE = 53
+    DEFAULT_OFFSPRING_PER_GENERATION = 3
+    DEFAULT_MUTATION_STRENGTH = 2
+
     def __init__(
         self,
-        population_size: int = 30,
-        offspring_per_generation: int = 30,
-        mutation_strength: int = 2,
+        population_size: int = DEFAULT_POPULATION_SIZE,
+        offspring_per_generation: int = DEFAULT_OFFSPRING_PER_GENERATION,
+        mutation_strength: int = DEFAULT_MUTATION_STRENGTH,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(criteria)

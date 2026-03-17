@@ -14,13 +14,19 @@ from solvers.base import VerboseCallback
 class MaxMinAntSystem(ACOSolverBase):
     """MAX-MIN Ant System. Only best-so-far deposits. Periodic reinitialization."""
 
+    DEFAULT_N_ANTS = 25
+    DEFAULT_ALPHA = 0.9331
+    DEFAULT_BETA = 2.2477
+    DEFAULT_RHO = 0.1293
+    DEFAULT_REINIT_FREQUENCY = 124
+
     def __init__(
         self,
-        n_ants: int = 20,
-        alpha: float = 1.0,
-        beta: float = 2.0,
-        rho: float = 0.1,
-        reinit_frequency: int = 100,
+        n_ants: int = DEFAULT_N_ANTS,
+        alpha: float = DEFAULT_ALPHA,
+        beta: float = DEFAULT_BETA,
+        rho: float = DEFAULT_RHO,
+        reinit_frequency: int = DEFAULT_REINIT_FREQUENCY,
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(n_ants, alpha, beta, rho, criteria)
