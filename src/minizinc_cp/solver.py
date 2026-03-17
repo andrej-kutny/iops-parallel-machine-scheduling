@@ -18,7 +18,7 @@ High-level flow:
 Requirements:
 - Python package: `minizinc` (see pyproject optional dependency).
 - MiniZinc 2.6+ installed on the system with at least one backend solver
-  (e.g. Gecode) configured.
+  (Chuffed) configured.
 """
 
 from __future__ import annotations
@@ -29,6 +29,17 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 import minizinc
+
+try:
+    from minizinc.instance import Instance
+    from minizinc.model import Model
+    from minizinc.solver import Solver
+except ModuleNotFoundError:
+    # Some installs expose Instance/Model/Solver only on the top-level module
+    Instance = minizinc.Instance
+    Model = minizinc.Model
+    Solver = minizinc.Solver
+
 import numpy as np
 
 from models.solution import SchedulingSolution
@@ -100,7 +111,7 @@ def _result_to_schedule(instance: "SchedulingInstance", assign: list, start: lis
 
 def solve_minizinc(
     instance: "SchedulingInstance",
-    solver_name: str = "gecode",
+    solver_name: str = "chuffed",
     time_limit_seconds: float | None = None,
 ) -> tuple["SchedulingSolution", float]:
     """
@@ -111,14 +122,10 @@ def solve_minizinc(
 
     Notes:
     - Any ImportError for the `minizinc` package will propagate up.
-    - If MiniZinc fails to find a solution (e.g. timeout), we fall back
-      to a random feasible solution so the rest of the pipeline can keep
-      running without special-casing this solver.
+    - We use the best solution found so far when the time limit is reached;
+      random fallback only when the solver finds no solution (e.g. UNSAT).
+    - Uses the Chuffed backend.
     """
-    Instance = minizinc.Instance
-    Model = minizinc.Model
-    Solver = minizinc.Solver
-
     model_dir = os.path.join(os.path.dirname(__file__))
     model_path = os.path.join(model_dir, "scheduling.mzn")
     model = Model(model_path)
@@ -130,22 +137,38 @@ def solve_minizinc(
     for key, value in data.items():
         mz_instance[key] = value
 
-    kwargs = {}
+    kwargs = {"intermediate_solutions": True}
     if time_limit_seconds is not None and time_limit_seconds > 0:
         kwargs["time_limit"] = timedelta(seconds=time_limit_seconds)
 
     result = mz_instance.solve(**kwargs)
 
-    if result.status.name not in ("SATISFIED", "OPTIMAL_SOLUTION"):
-        # No solution found: return a feasible random solution as fallback
-        # so the pipeline doesn't crash.
+    # Use the solver's solution whenever we have one (including best incumbent
+    # on time limit / UNKNOWN). Only fall back to random when no solution exists.
+    # With intermediate_solutions=True we may have multiple; solutions are in
+    # find-order, not objective-order—so pick the one with minimum makespan.
+    try:
+        if len(result) > 1:
+            best_idx = 0
+            best_makespan = None
+            for i in range(len(result)):
+                end_i = list(result[(i, "end")])
+                ms = int(max(end_i))
+                if best_makespan is None or ms < best_makespan:
+                    best_makespan = ms
+                    best_idx = i
+            assign = list(result[(best_idx, "assign")])
+            start = list(result[(best_idx, "start")])
+            end = list(result[(best_idx, "end")])
+        else:
+            assign = list(result["assign"])
+            start = list(result["start"])
+            end = list(result["end"])
+    except (KeyError, TypeError):
+        # No solution (e.g. UNSATISFIABLE or solver found nothing before timeout)
         rng = np.random.default_rng()
         fallback = SolverBase._random_solution(instance, rng)
         return fallback, float(fallback.compute_makespan())
-
-    assign = list(result["assign"])
-    start = list(result["start"])
-    end = list(result["end"])
     makespan = int(max(end))
     schedule = _result_to_schedule(instance, assign, start)
     solution = SchedulingSolution(schedule, instance)
@@ -174,7 +197,7 @@ class MinizincSolver:
 
     def __init__(
         self,
-        solver_name: str = "gecode",
+        solver_name: str = "chuffed",
         criteria: list[StoppingCriterion] | None = None,
     ):
         self.solver_name = solver_name

@@ -51,4 +51,6 @@ constraint forall(i, j in 1..n where i < j)(
 );
 
 % Objective: minimize the makespan (latest completion time over all jobs)
-solve minimize max(j in 1..n)(end[j]);
+% Search: assign machine per job first (first_fail), then start times
+solve :: int_search(assign, first_fail, indomain_min)
+    minimize max(j in 1..n)(end[j]);
