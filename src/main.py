@@ -12,6 +12,8 @@ from stopping_criteria import (
 from solvers.grasp import GraspSolver
 from solvers.simulated_annealing import SimulatedAnnealingSolver
 from solvers.evolution_strategy import EvolutionStrategySolver
+from solvers.iterated_local_search import ILSSolver
+from solvers.genetic_algorithm import GeneticAlgorithmSolver
 from solvers.ant_system import AntSystem
 from solvers.max_min_ant_system import MaxMinAntSystem
 from solvers.ant_colony_system import AntColonySystem
@@ -85,6 +87,12 @@ def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
         return AntMultiTourSystem(
             n_ants=20, alpha=1.0, beta=2.0, rho=0.1,
             q_tours=5, criteria=criteria
+        )
+    elif solver_name == "ils":
+        return ILSSolver(perturbation_strength=5, criteria=criteria)
+    elif solver_name == "ga":
+        return GeneticAlgorithmSolver(
+            population_size=30, offspring_per_generation=30, mutation_strength=2, criteria=criteria
         )
     elif solver_name == "combined":
         sub_solvers = [

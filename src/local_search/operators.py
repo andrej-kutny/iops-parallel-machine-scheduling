@@ -228,3 +228,18 @@ def random_neighbor(solution: SchedulingSolution, instance: SchedulingInstance, 
                     return SS(new_schedule, instance)
 
     return solution.copy()
+
+
+def perturb(
+    solution: SchedulingSolution,
+    instance: SchedulingInstance,
+    strength: int,
+    rng: np.random.Generator | None = None,
+) -> SchedulingSolution:
+    """Apply 'strength' random moves to escape local optima (e.g. for ILS)."""
+    if rng is None:
+        rng = np.random.default_rng()
+    current = solution.copy()
+    for _ in range(max(1, strength)):
+        current = random_neighbor(current, instance, rng)
+    return current
