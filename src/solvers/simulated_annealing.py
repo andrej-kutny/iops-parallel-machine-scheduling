@@ -25,7 +25,7 @@ class SimulatedAnnealingSolver(SolverBase):
     ):
         super().__init__(criteria)
         self.initial_temp = initial_temp
-        self.cooling_rate = cooling_rate or GeometricCooling(cooling_rate=0.995)
+        self.cooling_rate = cooling_rate if isinstance(cooling_rate, SACoolingBase) else GeometricCooling(cooling_rate=0.995)
         self.reheat_factor = reheat_factor
         self.reheat_patience = reheat_patience
 
