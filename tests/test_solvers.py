@@ -138,3 +138,16 @@ class TestGeneticAlgorithmSolver:
         feasible, msg = child.is_feasible()
         assert feasible, msg
         assert child.compute_makespan() > 0
+
+
+class TestMinizincSolver:
+    def test_produces_feasible(self, small_instance):
+        pytest.importorskip("minizinc")
+        from minizinc_cp import MinizincSolver
+        from stopping_criteria import TimeLimit
+        solver = MinizincSolver(solver_name="gecode", criteria=[TimeLimit(5)])
+        solution, cost, history = solver.solve(small_instance)
+        feasible, msg = solution.is_feasible()
+        assert feasible, msg
+        assert cost > 0
+        assert len(history) == 1

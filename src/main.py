@@ -94,6 +94,14 @@ def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
         return GeneticAlgorithmSolver(
             population_size=30, offspring_per_generation=30, mutation_strength=2, criteria=criteria
         )
+    elif solver_name == "minizinc":
+        try:
+            from minizinc_cp import MinizincSolver
+        except ImportError as e:
+            raise ValueError(
+                "MiniZinc solver requires: pip install minizinc (and MiniZinc 2.6+ with a backend e.g. Gecode)"
+            ) from e
+        return MinizincSolver(solver_name="gecode", criteria=criteria)
     elif solver_name == "combined":
         sub_solvers = [
             GraspSolver(alpha=0.5),
@@ -174,9 +182,9 @@ def main():
 
     log("--- Done ---", min_level=0)
     if feasible:
-        log(f"Makespan: {makespan}, Feasible", min_level=0)
+        log(f"Makespan: {int(makespan)}, Feasible", min_level=0)
     else:
-        log(f"Makespan: {makespan}, Infeasible: {msg}", min_level=0)
+        log(f"Makespan: {int(makespan)}, Infeasible: {msg}", min_level=0)
     log(f"Generations: {len(history)}")
     log(f"Triggered: {triggered}", min_level=0)
     log(solution, min_level=0)
