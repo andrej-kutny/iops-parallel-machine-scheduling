@@ -148,7 +148,7 @@ class TestMinizincSolver:
         
         from minizinc_cp import MinizincSolver
         from stopping_criteria import TimeLimit
-        solver = MinizincSolver(solver_name="gecode", criteria=[TimeLimit(5)])
+        solver = MinizincSolver(solver_name="chuffed", criteria=[TimeLimit(5)])
         solution, cost, history = solver.solve(small_instance)
         feasible, msg = solution.is_feasible()
         assert feasible, msg
