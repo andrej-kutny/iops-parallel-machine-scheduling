@@ -9,26 +9,32 @@ from models.solution import SchedulingSolution
 from stopping_criteria import StoppingCriterion
 from solvers.base import SolverBase, VerboseCallback
 
+# A solver factory is a callable that returns a fresh SolverBase instance.
+SolverFactory = Callable[[], SolverBase]
+
 
 class CombinedSolver(SolverBase):
     """Runs multiple solvers in sequence, restarting the cycle when a new best is found.
 
+    Each solver is created fresh (via a factory) on every run, so no mutable
+    state (pheromone trails, populations, etc.) leaks between runs.
+
     Flow:
-    1. Start with remaining = [solver_0, solver_1, ..., solver_n]
-    2. Pop the first solver, run it with criteria until a criterion fires
+    1. Start with remaining = [factory_0, factory_1, ..., factory_n]
+    2. Pop the first factory, instantiate a fresh solver, run it until a criterion fires
     3. If a new global best was found during this solver's run,
-       reset remaining to all solvers (so each gets another chance)
+       reset remaining to all factories (so each gets another chance)
     4. If remaining is empty (all solvers tried without improvement), stop
     5. Return the overall best solution
     """
 
     def __init__(
         self,
-        solvers: list[SolverBase],
+        solver_factories: list[SolverFactory],
         criteria: list[StoppingCriterion] | None = None,
     ):
         super().__init__(criteria)
-        self.solvers = solvers
+        self.solver_factories = solver_factories
 
     def _construct(self, instance: SchedulingInstance) -> SchedulingSolution:
         return self._random_solution(instance)
@@ -54,11 +60,12 @@ class CombinedSolver(SolverBase):
         overall_history: list[float] = []
         start = time.monotonic()
 
-        remaining = list(self.solvers)
+        remaining = list(range(len(self.solver_factories)))
         prev_solver_name: str | None = None
 
         while remaining:
-            solver = remaining.pop(0)
+            factory_idx = remaining.pop(0)
+            solver = self.solver_factories[factory_idx]()
             solver_name = type(solver).__name__
 
             if prev_solver_name is not None and on_solver_switch is not None:
@@ -93,12 +100,11 @@ class CombinedSolver(SolverBase):
                 if sub_copy.triggered:
                     orig.triggered = True
 
-            # If this solver improved, reset remaining to all solvers
+            # If this solver improved, reset remaining to all factories
             # starting from the next one (current solver just stagnated)
             if improved[0]:
-                idx = self.solvers.index(solver)
-                n = len(self.solvers)
-                remaining = [self.solvers[(idx + 1 + i) % n] for i in range(n)]
+                n = len(self.solver_factories)
+                remaining = [(factory_idx + 1 + i) % n for i in range(n)]
 
             prev_solver_name = solver_name
 
