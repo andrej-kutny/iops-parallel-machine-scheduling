@@ -65,7 +65,7 @@ def build_criteria(args) -> list[StoppingCriterion]:
     return criteria
 
 
-def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
+def build_solver(solver_name: str, criteria: list[StoppingCriterion], args=None):
     if solver_name == "grasp":
         return GraspSolver(criteria=criteria)
     elif solver_name == "sa":
@@ -89,9 +89,9 @@ def build_solver(solver_name: str, criteria: list[StoppingCriterion]):
             from minizinc_cp import MinizincSolver
         except ImportError as e:
             raise ValueError(
-                "MiniZinc solver requires: pip install minizinc (and MiniZinc 2.6+ with a backend e.g. Gecode)"
+                "MiniZinc solver requires: pip install minizinc (and MiniZinc 2.6+ with Chuffed)"
             ) from e
-        return MinizincSolver(solver_name="gecode", criteria=criteria)
+        return MinizincSolver(solver_name="chuffed", criteria=criteria)
     elif solver_name == "combined":
         solver_factories = [
             ILSSolver,
@@ -137,6 +137,11 @@ def main():
 
     instance = SchedulingInstance(args.instance)
     log(f"Loaded {instance}")
+
+    criteria = build_criteria(args)
+    solver = build_solver(args.solver, criteria, args)
+    log(f"Running {args.solver} solver...")
+    log(f"Stopping criteria: {criteria}")
 
     on_new_best = None
     on_solver_switch = None
