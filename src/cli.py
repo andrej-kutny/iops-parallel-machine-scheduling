@@ -52,9 +52,9 @@ def parse_args(args=None):
         help="Stop when makespan reaches this target value",
     )
     parser.add_argument(
-        "-o", "--output",
+        "-o", "--output-dir",
         default=None,
-        help="Output JSON file path (prints to stdout if not set)",
+        help="Directory to save solutions (default: results/<timestamp>_<solver>)",
     )
     parser.add_argument(
         "--seed",
